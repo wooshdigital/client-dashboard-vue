@@ -66,3 +66,36 @@ class ApiService {
 
         return Promise.reject(error)
       }
+    )
+  }
+
+  public get(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse> {
+    return this.axiosInstance.get(url, config)
+  }
+
+  public post(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse> {
+    return this.axiosInstance.post(url, data, config)
+  }
+
+  public put(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse> {
+    return this.axiosInstance.put(url, data, config)
+  }
+
+  public patch(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse> {
+    return this.axiosInstance.patch(url, data, config)
+  }
+
+  public delete(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse> {
+    return this.axiosInstance.delete(url, config)
+  }
+
+  public setAuthToken(token: string): void {
+    this.axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`
+  }
+
+  public clearAuthToken(): void {
+    delete this.axiosInstance.defaults.headers.common['Authorization']
+  }
+}
+
+export default new ApiService()
