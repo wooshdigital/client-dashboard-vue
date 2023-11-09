@@ -140,3 +140,144 @@ export default defineComponent({
     const form = reactive({
       email: '',
       password: '',
+      remember: false
+    })
+    
+    const errors = reactive({
+      email: '',
+      password: ''
+    })
+    
+    const validateForm = (): boolean => {
+      errors.email = ''
+      errors.password = ''
+      
+      if (!form.email) {
+        errors.email = 'Email is required'
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+        errors.email = 'Please enter a valid email address'
+      }
+      
+      if (!form.password) {
+        errors.password = 'Password is required'
+      } else if (form.password.length < 6) {
+        errors.password = 'Password must be at least 6 characters'
+      }
+      
+      return !errors.email && !errors.password
+    }
+    
+    const handleLogin = async () => {
+      if (!validateForm()) return
+      
+      try {
+        loading.value = true
+        generalError.value = ''
+        
+        await store.dispatch('auth/login', {
+          email: form.email,
+          password: form.password
+        })
+        
+        toast.success('Successfully logged in!')
+        router.push('/')
+      } catch (error: any) {
+        console.error('Login error:', error)
+        
+        if (error.response?.data?.message) {
+          generalError.value = error.response.data.message
+        } else {
+          generalError.value = 'An error occurred during login. Please try again.'
+        }
+      } finally {
+        loading.value = false
+      }
+    }
+    
+    const handleForgotPassword = async () => {
+      try {
+        // Implementation would call AuthService.forgotPassword(resetEmail.value)
+        toast.success('Password reset link sent to your email!')
+        showForgotPassword.value = false
+        resetEmail.value = ''
+      } catch (error) {
+        toast.error('Failed to send password reset email')
+      }
+    }
+    
+    const togglePasswordVisibility = () => {
+      showPassword.value = !showPassword.value
+    }
+    
+    return {
+      form,
+      errors,
+      loading,
+      showPassword,
+      showForgotPassword,
+      resetEmail,
+      generalError,
+      handleLogin,
+      handleForgotPassword,
+      togglePasswordVisibility
+    }
+  }
+})
+</script>
+
+<style scoped>
+.login-container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  border: none;
+  border-radius: 15px;
+}
+
+.card-body {
+  border-radius: 15px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 25px;
+  padding: 12px;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.form-control {
+  border-radius: 10px;
+  border: 1px solid #e1e5e9;
+  padding: 12px 15px;
+}
+
+.form-control:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.input-group .btn {
+  border-radius: 0 10px 10px 0;
+}
+
+@media (max-width: 576px) {
+  .login-card {
+    margin: 20px;
+  }
+  
+  .card-body {
+    padding: 2rem 1.5rem;
+  }
+}
+</style>
